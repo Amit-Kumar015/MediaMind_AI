@@ -97,6 +97,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.local
+.env.*.local
 .venv
 env/
 venv/
@@ -122,6 +124,12 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Coverage
+htmlcov/
+.coverage/
+coverage.xml
+coverage_report/
+
 # IDE / Editor
 .vscode/
 .idea/
@@ -137,6 +145,15 @@ vectorstores/
 *.faiss
 *.pkl
 *.pickle
+.whisper/
+*.model
+whisper_models/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+mongo_backup/
 
 # Large files
 *.mp3
