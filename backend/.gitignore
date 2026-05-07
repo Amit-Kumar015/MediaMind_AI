@@ -132,6 +132,7 @@ dmypy.json
 Thumbs.db
 
 # Project specific
+uploads/
 vectorstores/
 *.faiss
 *.pkl
@@ -147,3 +148,4 @@ vectorstores/
 *.tmp
 tmp/
 temp/
+

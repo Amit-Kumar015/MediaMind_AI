@@ -33,7 +33,7 @@ async def chat(file_id: str, question: str):
     # 🔥 2. Timestamp logic (ONLY for audio)
     timestamp = None
 
-    if doc.get("type") == "audio" and doc.get("segments"):
+    if doc.get("type") in ["audio", "video"] and doc.get("segments"):
         best_match = None
 
         for seg in doc["segments"]:
