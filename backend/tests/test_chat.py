@@ -30,7 +30,11 @@ def test_chat_flow(client):
             files={"file": ("sample.pdf", f, "application/pdf")}
         )
 
-    file_id = upload.json()["file_id"]
+    data = upload.json()
+
+    assert "file_id" in data
+
+    file_id = data["file_id"]
 
     response = client.post(
         "/chat",

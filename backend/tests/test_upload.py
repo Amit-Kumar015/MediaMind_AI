@@ -1,8 +1,30 @@
 import pytest
 from fastapi.testclient import TestClient
 from io import BytesIO
+from unittest.mock import patch
+from app.main import app
 
+client = TestClient(app)
 
+@patch("app.upload.extract_text")
+def test_upload_pdf(mock_extract):
+    mock_extract.return_value = "sample text"
+
+    with open("sample.pdf", "rb") as f:
+
+        response = client.post(
+            "/upload",
+            files={
+                "file": (
+                    "sample.pdf",
+                    f,
+                    "application/pdf"
+                )
+            }
+        )
+
+    assert response.status_code == 200
+    
 @pytest.fixture
 def client():
     """Lazy-load the app client to avoid hanging imports"""
