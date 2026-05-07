@@ -53,17 +53,19 @@ const Chat = ({ fileId, audioUrl, mediaType, mediaUrl }) => {
 
             <p className="text-zinc-300 whitespace-pre-wrap">{msg.answer}</p>
 
-            <button
-              onClick={() => {
-                if (audioRef.current) {
-                  audioRef.current.currentTime = msg.timestamp;
-                  audioRef.current.play();
-                }
-              }}
-              className="mt-4 bg-zinc-700 hover:bg-zinc-600 px-4 py-2 rounded-lg text-sm"
-            >
-              ▶ Jump to {msg.timestamp.toFixed(2)}s
-            </button>
+            {(mediaType === "audio" || mediaType === "video") && (
+              <button
+                onClick={() => {
+                  if (audioRef.current) {
+                    audioRef.current.currentTime = msg.timestamp;
+                    audioRef.current.play();
+                  }
+                }}
+                className="mt-4 bg-zinc-700 hover:bg-zinc-600 px-4 py-2 rounded-lg text-sm"
+              >
+                ▶ Jump to {msg.timestamp.toFixed(2)}s
+              </button>
+            )}
           </div>
         ))}
       </div>
