@@ -4,9 +4,14 @@ from groq import Groq
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
 def ask_ai(context, question):
+  api_key = os.getenv("GROQ_API_KEY")
+
+  if not api_key:
+      return "Mock AI response"
+
+  client = Groq(api_key=api_key)
+  
   try:
     prompt = f"""
     Answer the question based only on the context below.
