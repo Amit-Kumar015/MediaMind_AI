@@ -1,5 +1,6 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
-from app.auth import get_current_user
+from fastapi import APIRouter, Request, UploadFile, File, HTTPException, Depends, Query
+from fastapi.responses import FileResponse
+from app.auth import get_current_user, oauth2_scheme, SECRET_KEY, ALGORITHM
 from app.pdf import extract_text
 from app.db import collection
 import uuid
@@ -7,6 +8,7 @@ from app.rag import create_vector_store, save_vector_store
 from app.audio import transcribe_audio
 import os
 import traceback
+import jwt
 
 vector_store_map = {}
 
@@ -140,3 +142,46 @@ async def upload_video(file: UploadFile = File(...), current_user: dict = Depend
       print(f"Error uploading video: {str(e)}")
       print(traceback.format_exc())
       raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+@router.get("/media/{file_id}")
+async def get_media(file_id: str, request: Request, token: str = Query(None)):
+    active_token = None
+
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        active_token = auth_header.split(" ")[1]
+        
+    elif token:
+        active_token = token
+
+    if not active_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    try:
+        payload = jwt.decode(active_token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token session payload")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Token signature expired or invalid")
+
+    doc = collection.find_one({"file_id": file_id, "user_id": user_id})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Media asset not found or unauthorized")
+
+    file_type = doc.get("type")
+    if file_type == "audio":
+        path = os.path.join(UPLOAD_DIR, f"{file_id}.mp3")
+    elif file_type == "video":
+        path = None
+        for f in os.listdir(UPLOAD_DIR):
+            if f.startswith(file_id) and not f.endswith(".pdf") and not f.endswith(".mp3"):
+                path = os.path.join(UPLOAD_DIR, f)
+                break
+    else:
+        raise HTTPException(status_code=400, detail="Not a playable media resource")
+
+    if not path or not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Physical stream file missing on host")
+
+    return FileResponse(path)

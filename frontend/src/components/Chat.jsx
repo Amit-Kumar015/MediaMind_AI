@@ -11,6 +11,10 @@ const Chat = ({ chatDetails, setChatDetails }) => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatDetails?.messages]);
 
+  const token = localStorage.getItem("token");
+  const mediaType = chatDetails.type || (chatDetails.title?.includes(".pdf") ? "pdf" : "audio"); 
+  const mediaUrl = `http://127.0.0.1:8000/media/${chatDetails.file_id}?token=${token}`;
+
   const askQuestion = async () => {
     if (!question.trim()) return;
 
@@ -37,14 +41,14 @@ const Chat = ({ chatDetails, setChatDetails }) => {
         ],
       }));
     } catch (err) {
-      alert("Error streaming message back from execution handler");
+      alert("Error getting response from model");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-5xl mx-auto px-6 py-6">
+    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-6 py-6">
       <div className="border-b border-zinc-800 pb-4 mb-4">
         <h2 className="text-lg font-bold truncate">{chatDetails.title}</h2>
       </div>
@@ -53,7 +57,7 @@ const Chat = ({ chatDetails, setChatDetails }) => {
         {chatDetails.messages.map((msg, i) => (
           <div
             key={i}
-            className={`max-w-[85%] rounded-2xl p-4 border text-sm leading-relaxed ${
+            className={`max-w-[85%] rounded-2xl p-4 border text-base leading-relaxed ${
               msg.role === "user"
                 ? "bg-zinc-800 border-zinc-700 ml-auto text-zinc-100"
                 : "bg-zinc-900 border-zinc-800 mr-auto text-zinc-300"
@@ -64,7 +68,7 @@ const Chat = ({ chatDetails, setChatDetails }) => {
             </p>
             <p className="whitespace-pre-wrap">{msg.content}</p>
 
-            {msg.timestamp !== null && msg.timestamp !== undefined && (
+            {(mediaType === "audio" || mediaType === "video") && msg.timestamp !== null && msg.timestamp !== undefined && (
               <button
                 onClick={() => {
                   if (mediaRef.current) {
@@ -87,7 +91,24 @@ const Chat = ({ chatDetails, setChatDetails }) => {
         <div ref={scrollRef} />
       </div>
 
-      <div className="flex gap-3 mt-4 pt-2 bg-zinc-950">
+      {mediaType === "audio" && (
+        <div className="mt-4">
+          <audio controls ref={mediaRef} src={mediaUrl} className="w-full max-h-10" />
+        </div>
+      )}
+
+      {mediaType === "video" && (
+        <div className="mt-4">
+          <video
+            controls
+            ref={mediaRef}
+            src={mediaUrl}
+            className="w-full max-h-64 bg-black rounded-xl shadow-inner"
+          />
+        </div>
+      )}
+
+      <div className="flex gap-3 mt-2 pt-2 bg-zinc-950">
         <input
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
@@ -97,7 +118,7 @@ const Chat = ({ chatDetails, setChatDetails }) => {
         />
         <button
           onClick={askQuestion}
-          className="bg-white text-black px-5 rounded-xl font-semibold text-sm hover:bg-zinc-300 transition"
+          className="bg-white text-black px-5 rounded-xl font-semibold text-sm hover:bg-zinc-300 transition cursor-pointer"
         >
           Send
         </button>

@@ -31,6 +31,7 @@ async def create_new_chat(payload: NewChatRequest, current_user: dict = Depends(
         "user_id": user_id,
         "file_id": payload.file_id,
         "title": f"Chat on {doc['filename']}",
+        "type": doc.get("type", "pdf"),
         "messages": [],
         "created_at": datetime.now(timezone.utc).isoformat()
     }
