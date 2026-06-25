@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import axios from "axios";
+import API from "../api";
 
 const Chat = ({ fileId, audioUrl, mediaType, mediaUrl }) => {
   const [question, setQuestion] = useState("");
@@ -13,8 +14,8 @@ const Chat = ({ fileId, audioUrl, mediaType, mediaUrl }) => {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://127.0.0.1:8000/chat",
+      const res = await API.post(
+        "/chat",
         {},
         {
           params: {
@@ -63,7 +64,7 @@ const Chat = ({ fileId, audioUrl, mediaType, mediaUrl }) => {
                 }}
                 className="mt-4 bg-zinc-700 hover:bg-zinc-600 px-4 py-2 rounded-lg text-sm"
               >
-                ▶ Jump to {msg.timestamp.toFixed(2)}s
+                ▶ Jump to {msg.timestamp}s
               </button>
             )}
           </div>

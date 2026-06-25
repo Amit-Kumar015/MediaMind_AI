@@ -1,28 +1,55 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Upload from "./components/Upload";
 import Chat from "./components/Chat";
+import Auth from "./components/Auth";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [fileId, setFileId] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
   const [mediaType, setMediaType] = useState("");
   const [mediaUrl, setMediaUrl] = useState("");
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) setIsAuthenticated(true);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+    setFileId(""); // Clear contextual elements
+    setAudioUrl("");
+    setMediaType("");
+    setMediaUrl("");
+  };
+
+  if (!isAuthenticated) {
+    return <Auth onAuthSuccess={() => setIsAuthenticated(true)} />;
+  }
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <div className="max-w-4xl mx-auto px-6 py-10">
-        <div className="mb-10">
-          <h1 className="text-5xl font-bold mb-3">AI Multimedia Q&A</h1>
-
-          <p className="text-zinc-400">
-            Upload PDFs or audio files and chat with AI.
-          </p>
+        <div className="flex justify-between items-start mb-10">
+          <div>
+            <h1 className="text-5xl font-bold mb-3">AI Multimedia Q&A</h1>
+            <p className="text-zinc-400">
+              Upload PDFs or audio files and chat with AI.
+            </p>
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 px-4 py-2 rounded-xl text-sm transition"
+          >
+            Log Out
+          </button>
         </div>
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 shadow-xl">
           <Upload
             setFileId={setFileId}
-            setAudioUrl={setMediaUrl}
+            setAudioUrl={setAudioUrl}
             setMediaType={setMediaType}
             setMediaUrl={setMediaUrl}
           />
