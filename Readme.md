@@ -59,8 +59,6 @@ Users can:
 * Dockerized application
 * Docker Compose setup
 * GitHub Actions CI/CD
-* Automated testing using Pytest
-* Coverage reporting using pytest-cov
 
 ---
 
@@ -121,7 +119,6 @@ project-root/
 │
 ├── backend/
 │   ├── app/
-│   ├── tests/
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   └── .env
@@ -196,7 +193,7 @@ MONGO_URL=mongodb://localhost:27017
 # Run Backend
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
 Backend URL:
@@ -245,80 +242,6 @@ docker compose up --build
 
 ---
 
-# Running Tests
-
-## Run Tests
-
-```bash
-pytest
-```
-
-## Run Coverage
-
-```bash
-pytest --cov=app --cov-report=term-missing
-```
-
----
-
-# API Endpoints
-
-## Upload PDF
-
-```http
-POST /upload
-```
-
----
-
-## Upload Audio
-
-```http
-POST /upload-audio
-```
-
----
-
-## Upload Video
-
-```http
-POST /upload-video
-```
-
----
-
-## Chat with AI
-
-```http
-POST /chat
-```
-
-Parameters:
-
-```json
-{
-  "file_id": "file_id",
-  "question": "your question"
-}
-```
-
----
-
-# CI/CD
-
-GitHub Actions is configured to:
-
-* Install dependencies
-* Run automated tests
-* Generate coverage reports
-
-Workflow file:
-
-```text
-.github/workflows/backend.yml
-```
-
----
 
 # Future Improvements
 
