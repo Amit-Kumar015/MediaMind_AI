@@ -9,3 +9,4 @@ db = client["media_mind_db"]
 
 collection = db["documents"]
 users_collection = db["users"]
+chats_collection = db["chats"]
