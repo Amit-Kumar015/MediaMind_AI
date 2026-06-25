@@ -76,7 +76,7 @@ function App() {
                 <button
                   key={c.chat_id}
                   onClick={() => handleSelectChat(c.chat_id)}
-                  className={`w-full text-left px-3 py-2 text-sm rounded-xl block truncate transition ${
+                  className={`w-full text-left px-3 py-2 text-sm rounded-xl block truncate transition cursor-pointer ${
                     activeChatId === c.chat_id
                       ? "bg-zinc-800 text-white font-medium"
                       : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
