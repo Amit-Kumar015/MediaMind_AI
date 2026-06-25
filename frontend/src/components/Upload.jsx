@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import API from "../api";
 
 const Upload = ({ setFileId, setAudioUrl, setMediaType, setMediaUrl }) => {
   const [loading, setLoading] = useState(false);
@@ -25,10 +26,7 @@ const Upload = ({ setFileId, setAudioUrl, setMediaType, setMediaUrl }) => {
     }
 
     try {
-      const res = await axios.post(
-        `http://127.0.0.1:8000/${endpoint}`,
-        formData,
-      );
+      const res = await API.post(`/${endpoint}`, formData);
 
       setFileId(res.data.file_id);
       const url = URL.createObjectURL(file);
