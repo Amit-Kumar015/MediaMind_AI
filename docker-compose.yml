@@ -1,45 +1,41 @@
 version: "3.9"
 
 services:
-
   backend:
     build: ./backend
     ports:
       - "8000:8000"
-
     volumes:
       - ./backend:/app
-
+      - backend_uploads:/app/uploads
+      - backend_vectorstores:/app/vectorstores
     env_file:
       - ./backend/.env
-
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/media_mind_db
     depends_on:
       - mongo
 
   frontend:
     build: ./frontend
-
     ports:
       - "5173:5173"
-
     volumes:
       - ./frontend:/app
       - /app/node_modules
-
     stdin_open: true
     tty: true
-
     depends_on:
       - backend
 
   mongo:
-    image: mongo
-
+    image: mongo:latest
     ports:
       - "27017:27017"
-
     volumes:
       - mongo_data:/data/db
 
 volumes:
   mongo_data:
+  backend_uploads: 
+  backend_vectorstores: 
