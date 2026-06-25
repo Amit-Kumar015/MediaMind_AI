@@ -14,7 +14,6 @@ export default function Auth({ onAuthSuccess }) {
 
     try {
       if (isLogin) {
-        // FastAPI OAuth2PasswordRequestForm relies on application/x-www-form-urlencoded
         const formData = new FormData();
         formData.append("username", email);
         formData.append("password", password);
@@ -23,7 +22,6 @@ export default function Auth({ onAuthSuccess }) {
         localStorage.setItem("token", res.data.access_token);
         onAuthSuccess();
       } else {
-        // Registration takes JSON body input payload
         await API.post("/register", { email, password });
         alert("Registration successful! Please login.");
         setIsLogin(true);
