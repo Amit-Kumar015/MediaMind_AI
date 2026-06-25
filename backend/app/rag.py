@@ -1,16 +1,10 @@
-# app/rag.py
-
 import os
-
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain.embeddings.base import Embeddings
 from sentence_transformers import SentenceTransformer
 
-
-# 🔥 Load model once (important)
 model = SentenceTransformer("all-MiniLM-L6-v2")
-
 
 class HFEmbedding(Embeddings):
     def embed_documents(self, texts):
@@ -27,11 +21,8 @@ def create_vector_store(text):
     )
 
     chunks = splitter.split_text(text)
-
     embeddings = HFEmbedding()
-
     db = FAISS.from_texts(chunks, embeddings)
-
     return db
   
 def save_vector_store(db, user_id, file_id):

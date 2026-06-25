@@ -25,7 +25,6 @@ class UserRegisterSchema(BaseModel):
     
 @app.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserRegisterSchema):
-    # Check if user already exists
     if users_collection.find_one({"email": user_data.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
     

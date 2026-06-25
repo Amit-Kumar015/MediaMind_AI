@@ -1,15 +1,12 @@
-# app/audio.py
-
 import whisper
 
-model = whisper.load_model("base")  # small + fast
+model = whisper.load_model("base")
 
 def transcribe_audio(file_path):
     result = model.transcribe(file_path)
 
     segments = result["segments"]
 
-    # structure it nicely
     transcript_data = []
     full_text = ""
 
