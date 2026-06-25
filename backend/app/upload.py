@@ -1,4 +1,5 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from app.auth import get_current_user
 from app.pdf import extract_text
 from app.db import collection
 import uuid
@@ -16,7 +17,7 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
-async def upload(file: UploadFile = File(...)):
+async def upload(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     try:
         # Validate file type
         if not file.filename.lower().endswith('.pdf'):
@@ -36,19 +37,22 @@ async def upload(file: UploadFile = File(...)):
         text = extract_text(file_path)
         if not text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from PDF")
+          
+        user_id = current_user["user_id"]
 
         # Create vector store
         db = create_vector_store(text)
 
         # Save to disk
-        save_vector_store(db, file_id)
+        save_vector_store(db, user_id, file_id)
 
         # Store in database
         collection.insert_one({
-            "file_id": file_id,
-            "filename": file.filename,
-            "content": text,
-            "type": "pdf"
+        "file_id": file_id,
+        "user_id": user_id,
+        "filename": file.filename,
+        "content": text,
+        "type": "pdf"
         })
 
         return {"file_id": file_id}
@@ -61,8 +65,10 @@ async def upload(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
   
 @router.post("/upload-audio")
-async def upload_audio(file: UploadFile = File(...)):
+async def upload_audio(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     try:
+        user_id = current_user["user_id"]
+
         # Validate file type
         if not any(file.filename.lower().endswith(ext) for ext in ['.mp3', '.wav', '.m4a', '.ogg']):
             raise HTTPException(status_code=400, detail="Only audio files are allowed (mp3, wav, m4a, ogg)")
@@ -81,10 +87,11 @@ async def upload_audio(file: UploadFile = File(...)):
         text, segments = transcribe_audio(file_path)
         if not text.strip():
             raise HTTPException(status_code=400, detail="Could not transcribe audio")
-
+  
         # Store in database
         collection.insert_one({
             "file_id": file_id,
+            "user_id": user_id,
             "filename": file.filename,
             "type": "audio",
             "content": text,
@@ -101,9 +108,10 @@ async def upload_audio(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
       
 @router.post("/upload-video")
-async def upload_video(file: UploadFile = File(...)):
+async def upload_video(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
   try:
     file_id = str(uuid.uuid4())
+    user_id = current_user["user_id"]
 
     # preserve extension
     extension = file.filename.split(".")[-1]
@@ -117,6 +125,7 @@ async def upload_video(file: UploadFile = File(...)):
 
     collection.insert_one({
         "file_id": file_id,
+        "user_id": user_id,
         "filename": file.filename,
         "type": "video",
         "content": text,

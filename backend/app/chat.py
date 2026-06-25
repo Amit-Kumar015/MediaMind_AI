@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 import asyncio
 
+from app.auth import get_current_user
 from app.db import collection
 from app.upload import vector_store_map
 from app.ai import ask_ai
@@ -10,15 +11,16 @@ from app.rag import load_vector_store
 router = APIRouter()
 
 @router.post("/chat")
-async def chat(file_id: str, question: str):
+async def chat(file_id: str, question: str, current_user: dict = Depends(get_current_user)):
+    user_id = current_user["user_id"]
     # 🔍 fetch document
-    doc = collection.find_one({"file_id": file_id})
+    doc = collection.find_one({"file_id": file_id, "user_id": user_id})
 
     if not doc:
         return {"error": "File not found"}
 
     # 🔥 1. Try vector store (PDF case)
-    db = load_vector_store(file_id)
+    db = load_vector_store(user_id, file_id)
 
     if db:
         docs = db.similarity_search(question, k=3)

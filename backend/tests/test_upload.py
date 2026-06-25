@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from io import BytesIO
 from unittest.mock import patch
-from app.main import app
+from backend.main import app
 
 client = TestClient(app)
 
@@ -28,7 +28,7 @@ def test_upload_pdf(mock_extract):
 @pytest.fixture
 def client():
     """Lazy-load the app client to avoid hanging imports"""
-    from app.main import app
+    from backend.main import app
     return TestClient(app)
 
 

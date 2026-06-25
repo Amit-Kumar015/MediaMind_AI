@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = MongoClient(os.getenv("MONGO_URL"))
-db = client["ai_mvp"]
+db = client["media_mind_db"]
 
 collection = db["documents"]
+users_collection = db["users"]

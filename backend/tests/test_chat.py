@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 @pytest.fixture
 def client():
     """Lazy-load the app client to avoid hanging imports"""
-    from app.main import app
+    from backend.main import app
     return TestClient(app)
 
 def test_chat_invalid_file(client):

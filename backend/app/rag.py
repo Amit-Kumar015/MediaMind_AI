@@ -34,15 +34,14 @@ def create_vector_store(text):
 
     return db
   
-def save_vector_store(db, file_id):
-    path = f"vectorstores/{file_id}"
+def save_vector_store(db, user_id, file_id):
+    path = f"vectorstores/{user_id}/{file_id}"
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     db.save_local(path)
     
-def load_vector_store(file_id):
-    path = f"vectorstores/{file_id}"
-
+def load_vector_store(user_id, file_id):
+    path = f"vectorstores/{user_id}/{file_id}"
     if os.path.exists(path):
         embeddings = HFEmbedding()
         return FAISS.load_local(path, embeddings, allow_dangerous_deserialization=True)
-
     return None
